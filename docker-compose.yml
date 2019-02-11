@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  pyspark:
+    container_name: pyspark
+    image: jupyter/all-spark-notebook:latest
+    ports:
+      - "8888:8888/tcp"
+      - "4040:4040/tcp"
+    working_dir: /work
+    volumes:
+      - ./work:/work:rw
+    networks:
+      - sandbox-cluster
+    
+  mssql.db:
+    container_name: pyspark-mssql
+    image: "microsoft/mssql-server-linux"
+    environment:
+      SA_PASSWORD: "Password1,"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1401:1433"
+    volumes:
+      - ./data/mssql:/var/opt/mssql:rw
+    networks:
+      - sandbox-cluster
+
+networks:
+    sandbox-cluster:
+        external:
+            name: sandbox-cluster
