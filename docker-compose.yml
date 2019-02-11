@@ -13,7 +13,7 @@ services:
       - sandbox-cluster
     
   mssql.db:
-    container_name: pyspark-mssql
+    container_name: mssql
     image: "microsoft/mssql-server-linux"
     environment:
       SA_PASSWORD: "Password1,"
@@ -22,6 +22,31 @@ services:
       - "1401:1433"
     volumes:
       - ./data/mssql:/var/opt/mssql:rw
+    networks:
+      - sandbox-cluster
+      
+  hadoop-namenode:
+    container_name: hadoop-namenode
+    image: 'uhopper/hadoop-namenode'
+    ports:
+      - "8020:8020"
+      - '50070:50070'
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:8020
+      - CLUSTER_NAME=hadoop-sandbox
+      - HDFS_CONF_dfs_replication=1
+    networks:
+      - sandbox-cluster
+
+  hadoop-datanode-1:    
+    container_name: hadoop-datanode-1
+    image: "uhopper/hadoop-datanode"
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:8020
+      - CLUSTER_NAME=hadoop-sandbox
+      - HDFS_CONF_dfs_replication=1
+    depends_on:
+      - "hadoop-namenode"
     networks:
       - sandbox-cluster
 
